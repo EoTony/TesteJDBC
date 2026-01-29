@@ -5,6 +5,7 @@ import model.dao.SellerDao;
 import model.entities.Department;
 import model.entities.Seller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class Program {
@@ -23,10 +24,24 @@ public class Program {
         sellers.forEach(System.out::println);
         System.out.println();
 
-        System.out.println("Teste findAll===");
+        System.out.println("===Teste findAll===");
         List<Seller> sellersAll = sellerDao.findAll();
         sellersAll.forEach(System.out::println);
         System.out.println();
+
+        System.out.println("===Teste Insert===");
+        Seller sellerInsert = new Seller(null,"Renan","Renan@gmail.com", LocalDate.now(),1200.0,department);
+        sellerDao.insert(sellerInsert);
+        System.out.println(sellerInsert);
+        System.out.println();
+
+        System.out.println("===Teste Update===");
+        seller.setName("Souzones");
+        sellerDao.update(seller);
+        sellersAll = sellerDao.findAll();
+        sellersAll.forEach(System.out::println);
+        System.out.println();
+
 
 
     }

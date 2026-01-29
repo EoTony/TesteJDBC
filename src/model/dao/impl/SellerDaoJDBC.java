@@ -6,10 +6,8 @@ import model.dao.SellerDao;
 import model.entities.Department;
 import model.entities.Seller;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,12 +24,70 @@ public class SellerDaoJDBC  implements SellerDao {
 
     @Override
     public void insert(Seller seller) {
+        PreparedStatement st = null;
+        try{
+            st = connection.prepareStatement(
+                    "INSERT INTO seller "+
+                            "(Name, Email, BirthDate, BaseSalary, DepartmentId) "+
+                    "VALUES "+
+                            "(?, ?, ?, ?, ?) ",
+                    Statement.RETURN_GENERATED_KEYS
+            );
 
+            st.setString(1,seller.getName());
+            st.setString(2,seller.getEmail());
+            st.setObject(3,seller.getBirthDate());
+            st.setDouble(4,seller.getBaseSalary());
+            st.setInt(5,seller.getDepartment().getId());
+
+            int linhas = st.executeUpdate();
+            if (linhas > 0) {
+                ResultSet rs = st.getGeneratedKeys();
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    seller.setId(id);
+                }
+                Db.closeResultSet(rs);
+            }
+            else{
+                throw new DbException("Erro ao inserir seller");
+            }
+
+        }
+        catch(SQLException e){
+            throw new DbException(e.getMessage());
+        }
+        finally{
+            Db.closeStatement(st);
+        }
     }
 
     @Override
     public void update(Seller seller) {
+        PreparedStatement st = null;
 
+        try{
+             st = connection.prepareStatement( "UPDATE seller "+
+            "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "+
+                    "WHERE Id = ? "
+            );
+
+            st.setString(1,seller.getName());
+            st.setString(2,seller.getEmail());
+            st.setObject(3,seller.getBirthDate());
+            st.setDouble(4,seller.getBaseSalary());
+            st.setInt(5,seller.getDepartment().getId());
+            st.setInt(6,seller.getId());
+
+            st.executeUpdate();
+
+        }
+        catch(SQLException e){
+            throw new DbException(e.getMessage());
+        }
+        finally{
+            Db.closeStatement(st);
+        }
     }
 
     @Override
@@ -143,7 +199,7 @@ public class SellerDaoJDBC  implements SellerDao {
         seller.setId(rs.getInt("id"));
         seller.setName(rs.getString("Name"));
         seller.setEmail(rs.getString("Email"));
-        seller.setBirthDate(rs.getObject("BirthDate",LocalDateTime.class));
+        seller.setBirthDate(rs.getObject("BirthDate",LocalDate.class));
         seller.setBaseSalary(rs.getDouble("BaseSalary"));
         seller.setDepartment(dep);
 
