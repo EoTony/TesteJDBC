@@ -42,7 +42,11 @@ public class Program {
         sellersAll.forEach(System.out::println);
         System.out.println();
 
-
+        System.out.println("===Teste deleteById===");
+        sellerDao.deleteById(1);
+        sellersAll = sellerDao.findAll();
+        sellersAll.forEach(System.out::println);
+        System.out.println();
 
     }
 }

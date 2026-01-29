@@ -8,11 +8,7 @@ import model.entities.Seller;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SellerDaoJDBC  implements SellerDao {
 
@@ -91,8 +87,27 @@ public class SellerDaoJDBC  implements SellerDao {
     }
 
     @Override
-    public void delete(Seller seller) {
+    public void deleteById(Integer id) {
+        PreparedStatement st = null;
+        try{
+            st = connection.prepareStatement(
+                    "DELETE FROM seller " +
+                            "WHERE Id = ? "
+            );
+            st.setInt(1,id);
+            int  linhas = st.executeUpdate();
+            if (linhas < 1) {
+                throw new InputMismatchException("Erro ao deletar seller. Id invalido!");
+            }
 
+
+        }
+        catch(SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        finally{
+            Db.closeStatement(st);
+        }
     }
 
     @Override
